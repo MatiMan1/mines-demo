@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mines Demo</title>
+<style>
+body {
+  background: #0f0f0f;
+  color: white;
+  font-family: Arial;
+  text-align: center;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 70px);
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+.tile {
+  width: 70px;
+  height: 70px;
+  background: #1f1f1f;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.tile:hover {
+  background: #333;
+}
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  background: #00c853;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<h1>Mines Demo (Fake Credits Only)</h1>
+<p>Educational Use Only – No Real Money</p>
+
+<p>Balance: $<span id="balance">1000</span></p>
+<p>Multiplier: x<span id="multiplier">1</span></p>
+
+<button onclick="startGame()">Start Game</button>
+<button onclick="cashOut()">Cash Out</button>
+
+<div class="grid" id="grid"></div>
+
+<script>
+let balance = 1000;
+let bet = 50;
+let minesCount = 3;
+let mines = [];
+let revealed = 0;
+let playing = false;
+
+const grid = document.getElementById("grid");
+
+function generateMines() {
+  mines = [];
+  while (mines.length < minesCount) {
+    let r = Math.floor(Math.random() * 25);
+    if (!mines.includes(r)) mines.push(r);
+  }
+}
+
+function startGame() {
+  if (balance < bet) return;
+  balance -= bet;
+  revealed = 0;
+  playing = true;
+  generateMines();
+  updateUI();
+  createGrid();
+}
+
+function createGrid() {
+  grid.innerHTML = "";
+  for (let i = 0; i < 25; i++) {
+    let tile = document.createElement("div");
+    tile.className = "tile";
+    tile.onclick = () => revealTile(i, tile);
+    grid.appendChild(tile);
+  }
+}
+
+function revealTile(index, tile) {
+  if (!playing) return;
+
+  if (mines.includes(index)) {
+    tile.style.background = "red";
+    playing = false;
+    return;
+  }
+
+  tile.style.background = "#00c853";
+  revealed++;
+  document.getElementById("multiplier").innerText = 
+    (1 + revealed * 0.25).toFixed(2);
+}
+
+function cashOut() {
+  if (!playing) return;
+  let multiplier = 1 + revealed * 0.25;
+  balance += bet * multiplier;
+  playing = false;
+  updateUI();
+}
+
+function updateUI() {
+  document.getElementById("balance").innerText = balance.toFixed(2);
+}
+
+createGrid();
+</script>
+
+</body>
+</html>
